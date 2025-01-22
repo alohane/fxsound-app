@@ -1,0 +1,32 @@
+name: Build FxSound
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Set up Visual Studio
+    - name: Set up Visual Studio
+      uses: microsoft/setup-msbuild@v1
+
+    # Install dependencies
+    - name: Install JUCE framework
+      run: |
+        curl -L https://github.com/juce-framework/JUCE/archive/refs/tags/6.1.6.zip -o juce.zip
+        Expand-Archive -Path juce.zip -DestinationPath C:/JUCE
+        echo "JUCE installed in C:/JUCE"
+
+    # Build the Visual Studio solution
+    - name: Build FxSound
+      run: |
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" fxsound/Project/FxSound.sln /p:Configuration=Release /p:Platform=ARM64
