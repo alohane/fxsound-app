@@ -1,0 +1,42 @@
+name: C/C++ CI on Windows ARM64
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest # Use the latest Windows runner
+    # Ensure the runner supports ARM64 cross-compilation
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        install: >-
+          base-devel
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-make
+        update: true
+
+    - name: Configure
+      run: ./configure
+      shell: msys2 {0}
+
+    - name: Build
+      run: make
+      shell: msys2 {0}
+
+    - name: Run Checks
+      run: make check
+      shell: msys2 {0}
+
+    - name: Perform Distcheck
+      run: make distcheck
+      shell: msys2 {0}
